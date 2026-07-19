@@ -1,0 +1,88 @@
+<section class="page-hero compact-hero">
+  <div class="container py-5">
+    <span class="eyebrow">PEDIDOS EN LÍNEA</span>
+    <h1>Elige tus favoritos y nosotros hacemos el resto.</h1>
+    <p>Delivery o recojo en local, con total calculado directamente desde la carta.</p>
+  </div>
+</section>
+
+<section class="order-page">
+  <div class="container py-5">
+    <div class="alert alert-danger alert-elevated" *ngIf="error">{{ error }}</div>
+    <div class="alert alert-success alert-elevated" *ngIf="success">{{ success }}</div>
+
+    <div class="row g-4">
+      <div class="col-lg-7">
+        <div class="panel-card menu-panel">
+          <div class="panel-heading">
+            <div><span class="section-kicker">CARTA DISPONIBLE</span><h2>Agrega platos a tu pedido</h2></div>
+            <span class="count-badge">{{ platos.length }} opciones</span>
+          </div>
+          <div class="skeleton-list" *ngIf="loadingMenu"><div *ngFor="let i of [1,2,3,4]" class="skeleton-row"></div></div>
+          <div class="dish-grid" *ngIf="!loadingMenu">
+            <article class="dish-card" *ngFor="let p of platos">
+              <div class="dish-art"><span>{{ p.categoria?.nombre === 'Bebidas' ? '🥤' : p.categoria?.nombre === 'Postres' ? '🍮' : '🍽️' }}</span></div>
+              <div class="dish-content">
+                <small>{{ p.categoria?.nombre }}</small>
+                <h3>{{ p.nombre }}</h3>
+                <p>{{ p.descripcion || 'Especialidad preparada al momento.' }}</p>
+                <div><strong>S/ {{ p.precio | number:'1.2-2' }}</strong><button type="button" class="btn btn-outline-gold" (click)="agregar(p)">Agregar +</button></div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="panel-card order-summary order-summary-sticky">
+          <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+            <div class="panel-heading"><div><span class="section-kicker">TU PEDIDO</span><h2>Resumen</h2></div><span class="cart-count">{{ detalles.length }}</span></div>
+            <div class="empty-cart" *ngIf="!detalles.length"><span>🛒</span><strong>Tu pedido está vacío</strong><small>Agrega platos desde la carta.</small></div>
+            <div formArrayName="detalles" class="cart-list">
+              <div class="cart-item" *ngFor="let d of detalles.controls; let i=index" [formGroupName]="i">
+                <div><strong>{{ d.controls['nombre'].value }}</strong><small>S/ {{ d.controls['precio'].value | number:'1.2-2' }}</small></div>
+                <input type="number" class="form-control" formControlName="cantidad" min="1" max="20" aria-label="Cantidad">
+                <button type="button" class="remove-btn" (click)="quitar(i)" aria-label="Quitar plato">×</button>
+              </div>
+            </div>
+            <div class="total-line"><span>Total</span><strong>S/ {{ total() | number:'1.2-2' }}</strong></div>
+
+            <div class="form-section">
+              <h4>Modalidad</h4>
+              <div class="delivery-options">
+                <label *ngFor="let tipo of tiposEntrega" [class.active]="form.controls.tipoEntrega.value === tipo.value">
+                  <input type="radio" formControlName="tipoEntrega" [value]="tipo.value">
+                  <span><strong>{{ tipo.label }}</strong><small>{{ tipo.detail }}</small></span>
+                </label>
+              </div>
+            </div>
+
+            <ng-container *ngIf="!auth.hasRole('CLIENTE')">
+              <div class="mb-3"><label>Cliente registrado</label><select class="form-select" formControlName="clienteId" (change)="seleccionarCliente()"><option [ngValue]="null">Cliente ocasional / sin cuenta</option><option *ngFor="let c of clientes" [ngValue]="c.id">{{ c.nombreCompleto }} · {{ c.email }}</option></select></div>
+              <div class="mb-3"><label>Nombre del cliente ocasional</label><input class="form-control" formControlName="nombreCliente" [readonly]="form.controls.clienteId.value !== null"></div>
+            </ng-container>
+
+            <div class="row g-3">
+              <div class="col-12"><label>Teléfono *</label><input class="form-control" formControlName="telefono" maxlength="9" placeholder="987654321"><small class="field-error" *ngIf="form.controls.telefono.touched && form.controls.telefono.invalid">Debe tener 9 dígitos y comenzar con 9.</small></div>
+
+              <ng-container *ngIf="isDelivery; else pickupFields">
+                <div class="col-12"><label>Dirección de entrega *</label><div class="input-action"><input class="form-control" formControlName="direccion" placeholder="Calle, urbanización y número"><button type="button" (click)="buscarDireccion()" [disabled]="searchingAddress">{{ searchingAddress ? 'Buscando...' : 'Ubicar' }}</button></div></div>
+                <div class="col-md-6"><label>Distrito *</label><input class="form-control" formControlName="distrito" placeholder="Ej. Chimbote"></div>
+                <div class="col-md-6"><label>Referencia</label><input class="form-control" formControlName="referencia" placeholder="Frente al parque..."></div>
+                <div class="col-12"><button type="button" class="location-btn" (click)="usarUbicacion()" [disabled]="locating">◎ {{ locating ? 'Obteniendo ubicación...' : 'Usar mi ubicación actual' }}</button></div>
+                <div class="col-12"><div id="delivery-map" class="delivery-map"></div><div class="map-warning" *ngIf="mapError">{{ mapError }}</div><small class="map-help">Haz clic en el mapa o arrastra el marcador para precisar la entrega. La dirección manual siempre está disponible.</small></div>
+              </ng-container>
+              <ng-template #pickupFields><div class="col-12"><label>Hora aproximada de recojo *</label><input type="time" class="form-control" formControlName="horaRecojo" min="12:00" max="21:30"><small class="text-muted">Disponible entre 12:00 y 21:30.</small></div></ng-template>
+
+              <div class="col-md-6"><label>Método de pago *</label><select class="form-select" formControlName="metodoPago"><option *ngFor="let m of metodosPago" [value]="m.value">{{ m.label }}</option></select></div>
+              <div class="col-12"><label>Observaciones</label><textarea class="form-control" rows="2" formControlName="observacion" placeholder="Sin cebolla, llamar al llegar, etc."></textarea></div>
+            </div>
+
+            <div class="payment-note"><span>🔒</span><p><strong>Pago simulado.</strong> El sistema registra el método y el estado, pero no procesa dinero real.</p></div>
+            <button class="btn btn-gold w-100 btn-lg" [disabled]="loading || !detalles.length">{{ loading ? 'Registrando pedido...' : 'Confirmar pedido' }}</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,41 @@
+<nav class="navbar navbar-expand-lg navbar-dark app-navbar sticky-top">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" routerLink="/"><img src="img/soldorado.png" alt="Logo El Sol Dorado" class="brand-logo-img me-2"><span><strong>El Sol Dorado</strong><small>Cocina peruana</small></span></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-label="Abrir navegación"><span class="navbar-toggler-icon"></span></button>
+    <div id="mainNav" class="collapse navbar-collapse">
+      <div class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+        <a class="nav-link" routerLink="/" fragment="inicio" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Inicio</a>
+        <a class="nav-link" routerLink="/" fragment="nosotros">Nosotros</a>
+        <a class="nav-link" routerLink="/" fragment="carta">Carta</a>
+        <a class="nav-link" routerLink="/" fragment="contacto">Contacto</a>
+        <a class="nav-link" *ngIf="authenticated" routerLink="/reservas" routerLinkActive="active">Reservar</a>
+        <a class="nav-link" *ngIf="authenticated" routerLink="/pedidos" routerLinkActive="active">Pedir</a>
+        <a class="nav-link management-link" *ngIf="authenticated" routerLink="/dashboard" routerLinkActive="active">{{isStaff?'Panel de gestión':'Mi cuenta'}}</a>
+        <a class="nav-link" *ngIf="!authenticated" routerLink="/registro">Crear cuenta</a>
+        <a class="btn btn-gold btn-sm ms-lg-2" *ngIf="!authenticated" routerLink="/login">Iniciar sesión</a>
+        <div class="dropdown ms-lg-2" *ngIf="authenticated">
+          <button class="user-menu dropdown-toggle" data-bs-toggle="dropdown"><span class="avatar">{{username.charAt(0)}}</span><span><strong>{{username}}</strong><small>{{roleLabel}}</small></span></button>
+          <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+            <li><a class="dropdown-item" routerLink="/dashboard">{{isStaff?'Panel de gestión':'Mi perfil y actividad'}}</a></li>
+            <li><a class="dropdown-item" routerLink="/pedidos">Nuevo pedido</a></li>
+            <li><a class="dropdown-item" routerLink="/reservas">Nueva reserva</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><button class="dropdown-item text-danger" (click)="logout()">Cerrar sesión</button></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+<main><router-outlet></router-outlet></main>
+<footer class="app-footer" id="contacto">
+  <div class="container py-5">
+    <div class="row g-4">
+      <div class="col-lg-4"><div class="footer-brand"><span class="brand-mark">SD</span><div><h3>El Sol Dorado</h3><p>Sabores peruanos, atención cálida y momentos para compartir.</p></div></div></div>
+      <div class="col-6 col-lg-2"><h4>Enlaces</h4><a routerLink="/">Inicio</a><a routerLink="/" fragment="nosotros">Nosotros</a><a routerLink="/" fragment="carta">Carta</a><a routerLink="/reservas">Reservas</a></div>
+      <div class="col-6 col-lg-3"><h4>Atención</h4><p>Lunes a domingo<br>12:00 p. m. – 9:30 p. m.</p><p>Chimbote, Ancash</p></div>
+      <div class="col-lg-3"><h4>Contáctanos</h4><p>📞 +51 999 888 777<br>✉ reservas@elsoldorado.pe</p><div class="social-links"><span>f</span><span>ig</span><span>tt</span></div></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 El Sol Dorado. Todos los derechos reservados.</span><span>Tradición peruana en cada plato.</span></div>
+  </div>
+</footer>

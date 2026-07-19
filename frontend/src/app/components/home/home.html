@@ -1,0 +1,59 @@
+<section id="inicio" class="hero-section">
+  <div class="hero-glow"></div>
+  <div class="container py-5">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-7 hero-copy">
+        <span class="eyebrow">SABOR PERUANO · ATENCIÓN CÁLIDA</span>
+        <h1>Tradición peruana servida <span>con un brillo especial.</span></h1>
+        <p>Disfruta una carta preparada para compartir. Reserva tu mesa o realiza tu pedido en pocos pasos.</p>
+        <div class="hero-actions"><a href="#carta" class="btn btn-gold btn-lg">Ver nuestra carta</a><a [routerLink]="auth.isAuthenticated()?'/reservas':'/login'" class="btn btn-outline-light btn-lg">Reservar mesa</a></div>
+        <div class="hero-facts"><div><strong>+20</strong><span>Platos peruanos</span></div><div><strong>Todos los días</strong><span>12:00 – 21:30</span></div><div><strong>Chimbote</strong><span>Ancash</span></div></div>
+      </div>
+      <div class="col-lg-5">
+        <div class="hero-visual">
+          <div class="plate"><span>🍛</span></div>
+          <div class="floating-card top"><small>Plato recomendado</small><strong>Lomo saltado</strong><span>⭐ 4.9</span></div>
+          <div class="floating-card bottom"><span class="status-dot"></span><div><strong>Atención disponible</strong><small>Pedidos y reservas en línea</small></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="nosotros" class="about-section section-space">
+  <div class="container"><div class="row align-items-center g-5">
+    <div class="col-lg-6"><div class="story-collage"><div class="story-main"><span>👨‍🍳</span><strong>Cocina con identidad</strong></div><div class="story-small one">🌽<small>Ingredientes seleccionados</small></div><div class="story-small two">🤝<small>Atención cercana</small></div></div></div>
+    <div class="col-lg-6"><span class="section-kicker">NUESTRA HISTORIA</span><h2 class="section-title">Una mesa donde la tradición vuelve a encontrarse.</h2><p>En El Sol Dorado celebramos la cocina peruana con recetas conocidas, porciones generosas y una atención pensada para familias, amigos y ocasiones especiales.</p><p>Nuestra plataforma facilita la experiencia desde antes de llegar: puedes revisar la carta, reservar una mesa o pedir para delivery y recojo.</p><div class="values"><div><span>✓</span>Preparación al momento</div><div><span>✓</span>Sabores peruanos</div><div><span>✓</span>Atención organizada</div><div><span>✓</span>Reservas en línea</div></div></div>
+  </div></div>
+</section>
+
+<section class="highlights-section section-space">
+  <div class="container"><div class="section-header"><div><span class="section-kicker">FAVORITOS DE LA CASA</span><h2 class="section-title">Platos que siempre provocan volver</h2></div><a href="#carta">Ver carta completa →</a></div>
+  <div class="row g-4"><div class="col-md-4" *ngFor="let plato of destacados"><article class="featured-card"><div class="featured-art"><span>{{icono(plato)}}</span><em *ngIf="plato.destacado">Recomendado</em></div><div class="featured-body"><small>{{plato.categoria?.nombre}}</small><h3>{{plato.nombre}}</h3><p>{{plato.descripcion||'Una especialidad preparada con el sabor de la casa.'}}</p><div><strong>S/ {{plato.precio|number:'1.2-2'}}</strong><a [routerLink]="auth.isAuthenticated()?'/pedidos':'/login'">Pedir</a></div></div></article></div></div>
+  </div>
+</section>
+
+<section class="services-section section-space"><div class="container"><div class="text-center section-intro"><span class="section-kicker">TODO EN UN SOLO LUGAR</span><h2 class="section-title">Elige cómo disfrutar El Sol Dorado</h2></div><div class="row g-4">
+  <div class="col-md-4"><article class="service-card"><span>🛵</span><h3>Delivery</h3><p>Indica tu dirección, confirma el punto en el mapa y recibe tu pedido.</p><a [routerLink]="auth.isAuthenticated()?'/pedidos':'/login'">Realizar pedido →</a></article></div>
+  <div class="col-md-4"><article class="service-card"><span>🛍️</span><h3>Recojo en local</h3><p>Selecciona la hora aproximada y recoge tu pedido sin esperas innecesarias.</p><a [routerLink]="auth.isAuthenticated()?'/pedidos':'/login'">Ordenar para recoger →</a></article></div>
+  <div class="col-md-4"><article class="service-card"><span>🍽️</span><h3>Reserva de mesa</h3><p>Escoge fecha, hora y cantidad de personas. Nosotros organizamos tu visita.</p><a [routerLink]="auth.isAuthenticated()?'/reservas':'/login'">Reservar mesa →</a></article></div>
+</div></div></section>
+
+<section id="carta" class="menu-section section-space">
+  <div class="container">
+    <div class="section-header align-items-end"><div><span class="section-kicker">NUESTRA CARTA</span><h2 class="section-title">Encuentra tu próximo favorito</h2></div><div class="filters"><input class="form-control" [(ngModel)]="texto" placeholder="Buscar plato..." aria-label="Buscar plato"><select class="form-select" [(ngModel)]="categoria" aria-label="Filtrar por categoría"><option value="">Todas las categorías</option><option *ngFor="let c of categorias" [value]="c.nombre">{{c.nombre}}</option></select></div></div>
+    <div *ngIf="cargando" class="menu-skeleton"><div *ngFor="let i of [1,2,3,4,5,6]"></div></div>
+    <div *ngIf="error" class="alert alert-danger">{{error}} <button class="btn btn-sm btn-outline-danger ms-2" (click)="cargarMenu()">Reintentar</button></div>
+    <div class="row g-4" *ngIf="!cargando&&!error">
+      <div class="col-md-6 col-lg-4" *ngFor="let plato of platosFiltrados"><article class="menu-card h-100"><div class="menu-art"><span>{{icono(plato)}}</span><div class="menu-tags"><em *ngIf="plato.destacado">Popular</em><em class="available">Disponible</em></div></div><div class="menu-card-body"><small>{{plato.categoria?.nombre}}</small><h3>{{plato.nombre}}</h3><p>{{plato.descripcion||'Especialidad de la casa.'}}</p><div class="menu-card-bottom"><strong>S/ {{plato.precio|number:'1.2-2'}}</strong><a [routerLink]="auth.isAuthenticated()?'/pedidos':'/login'" class="add-link">Agregar +</a></div></div></article></div>
+      <div class="col-12" *ngIf="platosFiltrados.length===0"><div class="empty-state">No encontramos platos con esos filtros.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="testimonials-section section-space"><div class="container"><div class="text-center section-intro"><span class="section-kicker">EXPERIENCIA EL SOL DORADO</span><h2 class="section-title">Detalles que hacen especial una visita</h2></div><div class="row g-4"><div class="col-md-4" *ngFor="let item of [
+  {text:'La reserva fue rápida y la atención muy ordenada.',name:'Cliente de demostración'},
+  {text:'Buena variedad, platos abundantes y sabor familiar.',name:'Reseña demostrativa'},
+  {text:'El recojo en local fue sencillo y el pedido estuvo listo.',name:'Cliente de demostración'}]"><article class="quote-card"><div>★★★★★</div><p>“{{item.text}}”</p><strong>{{item.name}}</strong><small>Opinión referencial para la presentación</small></article></div></div></div></section>
+
+<section class="contact-section section-space"><div class="container"><div class="contact-card"><div><span class="section-kicker">VISÍTANOS</span><h2>¿Listo para disfrutar nuestra cocina?</h2><p>Estamos en Trujillo y atendemos todos los días.</p><div class="contact-details"><span>📍 Chimbote, Ancash</span><span>🕒 12:00 p. m. – 9:30 p. m.</span><span>📞 +51 999 888 777</span></div></div><div class="contact-actions"><a [routerLink]="auth.isAuthenticated()?'/reservas':'/login'" class="btn btn-gold btn-lg">Reservar mesa</a><a [routerLink]="auth.isAuthenticated()?'/pedidos':'/login'" class="btn btn-outline-light btn-lg">Realizar pedido</a></div></div></div></section>

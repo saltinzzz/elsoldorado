@@ -1,0 +1,22 @@
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Logs y temporales
+*.log
+*.tmp
+*.swp
+
+# Historial de editores
+.history/
+
+# Variables de entorno (SEGURIDAD)
+.env
+.env.*
+
+# Archivos de Docker (opcional si generas locales)
+docker-compose.override.yml
+
+# Archivos generales que a veces se cuelan
+*.bak
+*.old
